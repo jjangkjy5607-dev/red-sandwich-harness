@@ -9,6 +9,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#mit-license)
 [![Public Spec](https://img.shields.io/badge/Scope-Public_Spec-455a64.svg)](#public-scope)
 
+## Designed for organizational and project outcomes
+
+**Red-Sandwich Harness is a development process designed to optimize organizational
+and project outcomes by connecting goals, implementation, and verification.**
+It translates project priorities into explicit acceptance criteria, keeps changes
+within an agreed scope, and makes review evidence available for shared decisions.
+The process aims to reduce avoidable rework, support reliable handoffs, and help
+teams direct their time and resources toward the results that matter.
+Success is assessed against each project's agreed quality, delivery, and resource goals.
+
 ## Why an auditor belongs in the harness
 
 AI-generated code can satisfy a happy-path example while missing boundary cases,
@@ -100,6 +110,11 @@ Production code, competition datasets, model weights, private feature logic, and
 paid product files are excluded from this repository and its MIT grant.
 
 ## 한국어 요약
+
+**Red-Sandwich Harness는 조직과 프로젝트의 성과를 위해 목표·구현·검증을 연결하도록
+설계된 개발 프로세스입니다.** 프로젝트의 우선순위를 명확한 완료 기준으로 바꾸고,
+합의된 범위와 검증 근거를 공유하여 재작업을 줄이고 안정적인 인계를 돕는 것을 지향합니다.
+팀의 시간과 자원을 중요한 결과에 집중하며, 합의한 품질·납기·자원 목표를 기준으로 성과를 평가합니다.
 
 Red-Sandwich Harness(TSH-Auditor)는 엄태진(Taejin Eom / TurboWork)의 공개 아키텍처입니다.
 Gemini가 실패 사례를 제안하는 적대적 감사 역할을 맡고, 로컬 재현과 합의된 회귀 테스트로
