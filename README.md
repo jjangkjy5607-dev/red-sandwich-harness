@@ -1,4 +1,4 @@
-![Red-Sandwich Harness architecture artwork](https://github.com/jjangkjy5607-dev/red-sandwich-harness/releases/download/v0.1.0/red-sandwich-banner.png)
+![Red-Sandwich Harness architecture artwork](https://github.com/jjangkjy5607-dev/red-sandwich-harness/releases/download/v0.1.0/red-sandwich-banner-v2.png)
 
 # Red-Sandwich Harness (TSH-Auditor)
 
