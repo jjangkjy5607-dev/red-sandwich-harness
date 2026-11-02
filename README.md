@@ -19,6 +19,33 @@ The process aims to reduce avoidable rework, support reliable handoffs, and help
 teams direct their time and resources toward the results that matter.
 Success is assessed against each project's agreed quality, delivery, and resource goals.
 
+## In practice: progress visibility and review evidence
+
+The following user-provided screenshots show the workflow in other development projects:
+stage tracking in a font project, and implementation alongside a review conversation.
+
+![Pipeline HUD showing the active stage, progress, checkpoint label, and pending subtasks](https://github.com/jjangkjy5607-dev/red-sandwich-harness/releases/download/v0.1.0/pipeline-hud-example.png)
+
+**Know where work stands.** Captured at Step 12 of 15, the HUD brings the active
+subtask, previous-stage checkpoint label, and waiting tasks into one view.
+Teams can see the current stage and the work still ahead at a glance.
+
+<details>
+<summary>View implementation, review, and terminal status together</summary>
+
+![User-provided implementation and Gemini review screenshot with terminal checklist](https://github.com/jjangkjy5607-dev/red-sandwich-harness/releases/download/v0.1.0/implementation-review-example.png)
+
+The review text reports seven passing tests and a PASS verdict for the discussed
+change; the terminal separately shows working and waiting tasks. These screenshots
+illustrate coordination and visible review records. The underlying projects and
+their tests are outside this two-file public example.
+
+</details>
+
+한국어: 실제 작업 화면에서 현재 단계·활성 작업·대기 항목과 검토 기록을 함께 확인하는
+방식을 보여 줍니다. 폰트 프로젝트 HUD의 12/15 표시는 촬영 당시 단계 위치이며,
+검수 화면의 PASS는 해당 변경에 대한 대화상 판정입니다.
+
 ## Why an auditor belongs in the harness
 
 AI-generated code can satisfy a happy-path example while missing boundary cases,
@@ -105,7 +132,7 @@ uv pip install --python 'D:\CodexProjects\.runtime\red-sandwich-public\Scripts\p
 ## Public scope
 
 The Git tree contains exactly this specification and the synthetic example.
-The header illustration is hosted separately as a GitHub release attachment.
+The header illustration and workflow screenshots are hosted as GitHub release attachments.
 Production code, competition datasets, model weights, private feature logic, and
 paid product files are excluded from this repository and its MIT grant.
 
