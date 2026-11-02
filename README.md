@@ -46,6 +46,14 @@ their tests are outside this two-file public example.
 방식을 보여 줍니다. 폰트 프로젝트 HUD의 12/15 표시는 촬영 당시 단계 위치이며,
 검수 화면의 PASS는 해당 변경에 대한 대화상 판정입니다.
 
+## Watch: define the spec before coding
+
+[**AI Researcher Hamjji · EP01 — What happens when you only ask Codex to “build an app”**](https://youtube.com/shorts/si5A6qREBhI)
+
+A 38-second Korean lesson: define the core purpose, inputs, processing, outputs,
+and excluded features in `spec.md` before generating code.
+한국어: [코덱스에 “앱 만들어줘”만 하면 생기는 일](https://youtube.com/shorts/si5A6qREBhI) · AI 연구원 햄찌 EP01.
+
 ## Why an auditor belongs in the harness
 
 AI-generated code can satisfy a happy-path example while missing boundary cases,
