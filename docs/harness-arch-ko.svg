@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1930" role="img" aria-label="레드 샌드위치 하네스 전체 메커니즘">
+<style>
+.bg{fill:#fff}.lane{fill:#f6f7f9}.laneR{fill:#f3f8f5}.laneG{fill:#fdf3f3}
+.t{fill:#1d2128;font-family:'Pretendard','Malgun Gothic','Segoe UI',sans-serif;text-anchor:middle}
+.b{font-size:14.5px;font-weight:700}.s{font-size:12.5px;fill:#4f5866}.lh{font-size:15px;font-weight:800}
+.ph{font-size:13px;font-weight:800;fill:#e8612c;text-anchor:end}.sep{stroke:#e8612c;stroke-width:1.2;stroke-dasharray:3 5;opacity:.6}
+.n{stroke-width:2.2;rx:12}.bread{fill:#fff7ec;stroke:#d9953f}.fill{fill:#f0fbf5;stroke:#2fa36b}.red{fill:#fff1f1;stroke:#e5484d}
+.hum{fill:#f1f4ff;stroke:#5b7cfa}.note{fill:#fffdf3;stroke:#b9a23a;stroke-dasharray:5 4}
+.ar{stroke:#7a8494;stroke-width:2;fill:none}.pass{stroke:#2fa36b}.fail{stroke:#e5484d}
+.el{font-size:11.5px;font-weight:700;fill:#5f6876}.ok{fill:#2fa36b}.ng{fill:#e5484d}
+.band{fill:#eef0f4;stroke:#d5d9e0}
+.fl{fill:none;stroke:#ff9d3c;stroke-width:3.4;stroke-linecap:round;stroke-dasharray:12 88;stroke-dashoffset:12;opacity:0;animation:fl 12.8s linear infinite;filter:drop-shadow(0 0 5px #ff9d3c)}
+.fl.pass{stroke:#3fe08f;filter:drop-shadow(0 0 5px #3fe08f)}.fl.fail{stroke:#ff5d5d;filter:drop-shadow(0 0 5px #ff5d5d)}
+@keyframes fl{0%{stroke-dashoffset:12;opacity:1}11%{stroke-dashoffset:-88;opacity:1}12%,100%{stroke-dashoffset:-88;opacity:0}}
+@media (prefers-reduced-motion: reduce){.fl{animation:none}}
+@media (prefers-color-scheme: dark){.bg{fill:#12161d}.lane{fill:#171c24}.laneR{fill:#15201b}.laneG{fill:#221719}
+.t{fill:#e7eaf0}.s,.el{fill:#a6aebb}.bread{fill:#2b2216}.fill{fill:#14271d}.red{fill:#2c1517}.hum{fill:#18203a}
+.note{fill:#26230f}.ar{stroke:#8d97a8}.band{fill:#1c222c;stroke:#323a47}}
+</style>
+<defs><marker id="mn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7a8494"/></marker><marker id="mp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2fa36b"/></marker><marker id="mf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e5484d"/></marker></defs>
+<rect class="bg" width="1000" height="1930" rx="18"/>
+<rect class="lane" x="20" y="20" width="180" height="1780" rx="14"/>
+<text class="t lh" x="110.0" y="52">사람</text>
+<rect class="laneR" x="220" y="20" width="250" height="1780" rx="14"/>
+<text class="t lh" x="345.0" y="52">하네스 (기계)</text>
+<rect class="lane" x="530" y="20" width="240" height="1780" rx="14"/>
+<text class="t lh" x="650.0" y="52">AI 세션</text>
+<rect class="laneG" x="790" y="20" width="190" height="1780" rx="14"/>
+<text class="t lh" x="885.0" y="52">독립 검수 (GPT)</text>
+<line class="sep" x1="20" x2="980" y1="100" y2="100"/><text class="t ph" x="972" y="116">0 기획</text>
+<line class="sep" x1="20" x2="980" y1="300" y2="300"/><text class="t ph" x="972" y="316">1 Step 시작</text>
+<line class="sep" x1="20" x2="980" y1="604" y2="604"/><text class="t ph" x="972" y="620">2 구현</text>
+<line class="sep" x1="20" x2="980" y1="1024" y2="1024"/><text class="t ph" x="972" y="1040">3 판정·커밋</text>
+<line class="sep" x1="20" x2="980" y1="1578" y2="1578"/><text class="t ph" x="972" y="1594">4 학습</text>
+<rect class="n hum" x="30" y="118" width="160" height="70" rx="12"/><text class="t b" x="110.0" y="148.0">기획서 작성</text><text class="t s" x="110.0" y="167.0">빈칸 양식 · 승인 체크</text>
+<rect class="n fill" x="540" y="118" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="148.0">명세 변환</text><text class="t s" x="650.0" y="167.0">Step 문서 · 하위 공정 3개↑</text>
+<rect class="n bread" x="230" y="205" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="235.0">기획 대조표 검사</text><text class="t s" x="345.0" y="254.0">빠진 항목·숫자·변경 사유</text>
+<rect class="n bread" x="230" y="318" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="348.0">Step 사전 점검</text><text class="t s" x="345.0" y="367.0">하위 공정 · 디스크 여유 · Step 잠금</text>
+<rect class="n bread" x="230" y="408" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="438.0">테스트 보호</text><text class="t s" x="345.0" y="457.0">테스트 수정 잠금 · 숨긴 테스트 격리</text>
+<rect class="n bread" x="230" y="498" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="528.0">새 AI 세션 시작</text><text class="t s" x="345.0" y="547.0">Step별 사고 수준 · 턴 상한</text>
+<rect class="n fill" x="540" y="498" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="528.0">인계 접수 · 실패 랙 스캔</text><text class="t s" x="650.0" y="547.0">지난 실패 요약 먼저 읽기</text>
+<rect class="n fill" x="540" y="622" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="652.0">코드 작성</text><text class="t s" x="650.0" y="671.0">Claude Code</text>
+<rect class="n bread" x="230" y="622" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="652.0">기계 검사 훅</text><text class="t s" x="345.0" y="671.0">200줄 · 35줄 · 복잡도 5 · 금지 패턴</text>
+<rect class="n fill" x="540" y="716" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="746.0">리뷰어 서브 에이전트</text><text class="t s" x="650.0" y="765.0">레퍼런스 비교 (최대 5회)</text>
+<rect class="n fill" x="540" y="810" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="840.0">3대 직교 진단</text><text class="t s" x="650.0" y="859.0">입력 파괴 · 리소스 · 출시 결함</text>
+<rect class="n red" x="800" y="810" width="170" height="90" rx="12"/><text class="t b" x="885.0" y="841.0">규약 검수</text><text class="t s" x="885.0" y="860.0">규칙 위반만 판정</text><text class="t s" x="885.0" y="879.0">같은 위반 3회 → 정지</text>
+<rect class="n fill" x="540" y="918" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="948.0">검수 요청만 남기고 종료</text><text class="t s" x="650.0" y="967.0">테스트 로그 첨부</text>
+<rect class="n bread" x="230" y="918" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="948.0">종료 검사 (Stop 훅)</text><text class="t s" x="345.0" y="967.0">3번 막히면 되돌림</text>
+<rect class="n bread" x="230" y="1042" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="1072.0">커밋할 트리 먼저 고정</text><text class="t s" x="345.0" y="1091.0">파일 지문 기록</text>
+<rect class="n bread" x="230" y="1132" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="1162.0">숨긴 테스트 · 변조 검사</text><text class="t s" x="345.0" y="1181.0">잠긴 파일 · 상태 · 예외 목록</text>
+<rect class="n bread" x="230" y="1222" width="230" height="64" rx="12"/><text class="t b" x="345.0" y="1249.0">규약 검수 재확인</text><text class="t s" x="345.0" y="1268.0">세션이 끝난 코드로</text>
+<rect class="n red" x="800" y="1208" width="170" height="104" rx="12"/><text class="t b" x="885.0" y="1246.0">최종 검수</text><text class="t s" x="885.0" y="1265.0">결함 3축 · 명세 반영</text><text class="t s" x="885.0" y="1284.0">AI의 '완료'는 근거 아님</text>
+<rect class="n red" x="230" y="1350" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="1380.0">실패 랙 기록</text><text class="t s" x="345.0" y="1399.0">사고 수준 올려 새 세션</text>
+<rect class="n hum" x="30" y="1350" width="160" height="70" rx="12"/><text class="t b" x="110.0" y="1380.0">Council 결정</text><text class="t s" x="110.0" y="1399.0">4회째 FAIL · 명세 변경</text>
+<rect class="n note" x="800" y="1456" width="170" height="90" rx="12"/><text class="t b" x="885.0" y="1487.0">API 장애</text><text class="t s" x="885.0" y="1506.0">3회 재시도 → 대기</text><text class="t s" x="885.0" y="1525.0">자체 PASS 없음</text>
+<rect class="n bread" x="230" y="1456" width="230" height="96" rx="12"/><text class="t b" x="345.0" y="1490.0">지문 · 트리 · 로그 대조</text><text class="t s" x="345.0" y="1509.0">검수한 트리 그대로 커밋</text><text class="t s" x="345.0" y="1528.0">다른 작업이 끼면 중단</text>
+<rect class="n fill" x="540" y="1470" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="1500.0">다음 세션 인계 접수</text><text class="t s" x="650.0" y="1519.0">= Step 완료</text>
+<rect class="n bread" x="230" y="1596" width="230" height="70" rx="12"/><text class="t b" x="345.0" y="1626.0">재시도 끝 PASS</text><text class="t s" x="345.0" y="1645.0">스킬 후보 자동 생성</text>
+<rect class="n hum" x="30" y="1596" width="160" height="70" rx="12"/><text class="t b" x="110.0" y="1626.0">승인 → 스킬 설치</text><text class="t s" x="110.0" y="1645.0">다른 프로젝트로 승격</text>
+<rect class="n note" x="800" y="1612" width="170" height="70" rx="12"/><text class="t b" x="885.0" y="1642.0">서킷 브레이커</text><text class="t s" x="885.0" y="1661.0">같은 Step 5번 → 정지</text>
+<rect class="n hum" x="30" y="1700" width="160" height="70" rx="12"/><text class="t b" x="110.0" y="1730.0">플레이테스트 게이트</text><text class="t s" x="110.0" y="1749.0">선언한 Step만</text>
+<rect class="n note" x="540" y="1700" width="220" height="70" rx="12"/><text class="t b" x="650.0" y="1730.0">지표 기록</text><text class="t s" x="650.0" y="1749.0">회차 · 롤백 · 비용</text>
+<rect class="n note" x="540" y="318" width="220" height="124" rx="12"/><text class="t b" x="650.0" y="348.0">스킬 불러오기 (필요할 때만)</text><text class="t s" x="650.0" y="367.0">시작: 실패 랙 · 구현 규칙</text><text class="t s" x="650.0" y="386.0">선언한 것만: UI · 게임 · 매매</text><text class="t s" x="650.0" y="405.0">검수 전: 검수 규칙</text><text class="t s" x="650.0" y="424.0">MCP: 무인 세션에서는 끔</text>
+<path class="ar " d="M190,153 H538" marker-end="url(#mn)"/><path class="fl " d="M190,153 H538" pathLength="100" style="animation-delay:0.0s"/>
+<path class="ar " d="M650,188 V240 H462" marker-end="url(#mn)"/><path class="fl " d="M650,188 V240 H462" pathLength="100" style="animation-delay:0.4s"/>
+<path class="ar fail" d="M230,240 H110 V190" marker-end="url(#mf)"/><path class="fl fail" d="M230,240 H110 V190" pathLength="100" style="animation-delay:0.8s"/><text class="t el" x="150" y="234" style="text-anchor:middle">보완</text>
+<path class="ar " d="M345,275 V316" marker-end="url(#mn)"/><path class="fl " d="M345,275 V316" pathLength="100" style="animation-delay:1.2s"/>
+<path class="ar " d="M345,388 V406" marker-end="url(#mn)"/><path class="fl " d="M345,388 V406" pathLength="100" style="animation-delay:1.6s"/>
+<path class="ar " d="M345,478 V496" marker-end="url(#mn)"/><path class="fl " d="M345,478 V496" pathLength="100" style="animation-delay:2.0s"/>
+<path class="ar " d="M460,533 H538" marker-end="url(#mn)"/><path class="fl " d="M460,533 H538" pathLength="100" style="animation-delay:2.4s"/>
+<path class="ar " d="M650,568 V620" marker-end="url(#mn)"/><path class="fl " d="M650,568 V620" pathLength="100" style="animation-delay:2.8s"/>
+<path class="ar " d="M650,442 V496" marker-end="url(#mn)"/><path class="fl " d="M650,442 V496" pathLength="100" style="animation-delay:3.2s"/>
+<path class="ar " d="M540,645 H462" marker-end="url(#mn)"/><path class="fl " d="M540,645 H462" pathLength="100" style="animation-delay:3.6s"/><text class="t el" x="500" y="636" style="text-anchor:middle">저장마다</text>
+<path class="ar fail" d="M460,672 H538" marker-end="url(#mf)"/><path class="fl fail" d="M460,672 H538" pathLength="100" style="animation-delay:4.0s"/><text class="t el ng" x="500" y="692" style="text-anchor:middle">위반 즉시 차단</text>
+<path class="ar " d="M650,692 V714" marker-end="url(#mn)"/><path class="fl " d="M650,692 V714" pathLength="100" style="animation-delay:4.4s"/>
+<path class="ar " d="M650,786 V808" marker-end="url(#mn)"/><path class="fl " d="M650,786 V808" pathLength="100" style="animation-delay:4.8s"/>
+<path class="ar " d="M760,834 H798" marker-end="url(#mn)"/><path class="fl " d="M760,834 H798" pathLength="100" style="animation-delay:5.2s"/>
+<path class="ar fail" d="M800,866 H762" marker-end="url(#mf)"/><path class="fl fail" d="M800,866 H762" pathLength="100" style="animation-delay:5.6s"/>
+<path class="ar " d="M650,880 V916" marker-end="url(#mn)"/><path class="fl " d="M650,880 V916" pathLength="100" style="animation-delay:6.0s"/>
+<path class="ar " d="M540,943 H462" marker-end="url(#mn)"/><path class="fl " d="M540,943 H462" pathLength="100" style="animation-delay:6.4s"/>
+<path class="ar pass" d="M460,972 H538" marker-end="url(#mp)"/><path class="fl pass" d="M460,972 H538" pathLength="100" style="animation-delay:6.8s"/><text class="t el ok" x="500" y="992" style="text-anchor:middle">통과해야 종료</text>
+<path class="ar " d="M650,988 V1010 H345 V1040" marker-end="url(#mn)"/><path class="fl " d="M650,988 V1010 H345 V1040" pathLength="100" style="animation-delay:7.2s"/>
+<path class="ar " d="M345,1112 V1130" marker-end="url(#mn)"/><path class="fl " d="M345,1112 V1130" pathLength="100" style="animation-delay:7.6s"/>
+<path class="ar " d="M345,1202 V1220" marker-end="url(#mn)"/><path class="fl " d="M345,1202 V1220" pathLength="100" style="animation-delay:8.0s"/>
+<path class="ar " d="M460,1254 H798" marker-end="url(#mn)"/><path class="fl " d="M460,1254 H798" pathLength="100" style="animation-delay:8.4s"/>
+<path class="ar fail" d="M830,1312 V1385 H462" marker-end="url(#mf)"/><path class="fl fail" d="M830,1312 V1385 H462" pathLength="100" style="animation-delay:8.8s"/><text class="t el ng" x="740" y="1378" style="text-anchor:middle">FAIL 1~3회</text>
+<path class="ar fail" d="M230,1370 H212 V533 H228" marker-end="url(#mf)"/><path class="fl fail" d="M230,1370 H212 V533 H228" pathLength="100" style="animation-delay:9.2s"/>
+<path class="ar fail" d="M230,1405 H192" marker-end="url(#mf)"/><path class="fl fail" d="M230,1405 H192" pathLength="100" style="animation-delay:9.6s"/><text class="t el ng" x="211" y="1434" style="text-anchor:middle">4회째</text>
+<path class="ar fail" d="M950,1312 V1454" marker-end="url(#mf)"/><path class="fl fail" d="M950,1312 V1454" pathLength="100" style="animation-delay:10.0s"/>
+<path class="ar pass" d="M870,1312 V1442 H345 V1454" marker-end="url(#mp)"/><path class="fl pass" d="M870,1312 V1442 H345 V1454" pathLength="100" style="animation-delay:10.4s"/><text class="t el ok" x="878" y="1340" style="text-anchor:start">PASS</text>
+<path class="ar " d="M460,1505 H538" marker-end="url(#mn)"/><path class="fl " d="M460,1505 H538" pathLength="100" style="animation-delay:10.8s"/>
+<path class="ar " d="M650,1540 V1564 H345 V1594" marker-end="url(#mn)"/><path class="fl " d="M650,1540 V1564 H345 V1594" pathLength="100" style="animation-delay:11.2s"/>
+<path class="ar " d="M230,1631 H192" marker-end="url(#mn)"/><path class="fl " d="M230,1631 H192" pathLength="100" style="animation-delay:11.6s"/>
+<path class="ar " d="M300,1666 V1735 H192" marker-end="url(#mn)"/><path class="fl " d="M300,1666 V1735 H192" pathLength="100" style="animation-delay:12.0s"/>
+<text class="t el ng" x="202" y="980" transform="rotate(-90 202 980)">새 세션 (사고 수준↑)</text>
+<text class="t el ng" x="885" y="918">↑ 위반만 고침</text>
+<rect class="band" x="20" y="1812" width="960" height="48" rx="12"/><text class="t s" x="500" y="1842">장비 가드 — 메모리 예약 · 디스크 여유 · CPU 병렬 상한 · 그리기는 그래픽카드로만</text>
+<rect class="n hum" x="40" y="1878" width="22" height="16" rx="4"/><text class="t s" x="70" y="1891" style="text-anchor:start">사람 결정</text>
+<rect class="n bread" x="280" y="1878" width="22" height="16" rx="4"/><text class="t s" x="310" y="1891" style="text-anchor:start">하네스·커밋</text>
+<rect class="n fill" x="520" y="1878" width="22" height="16" rx="4"/><text class="t s" x="550" y="1891" style="text-anchor:start">AI 작업</text>
+<rect class="n red" x="760" y="1878" width="22" height="16" rx="4"/><text class="t s" x="790" y="1891" style="text-anchor:start">독립 검수·실패</text>
+</svg>

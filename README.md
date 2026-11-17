@@ -1,162 +1,165 @@
-![Red-Sandwich Harness architecture artwork](https://github.com/jjangkjy5607-dev/red-sandwich-harness/releases/download/v0.1.0/red-sandwich-banner-v2.png)
+# Red-Sandwich Harness
 
-# Red-Sandwich Harness (TSH-Auditor)
+**A development pipeline for AI coding agents that does not trust the AI.**
 
-**Adversarial Gemini Red-Team Auditing & Deterministic TDD Sandwich Framework**
-
-**Creator / Original Author:** Taejin Eom (TurboWork) · 엄태진
+**Creator / Original Author:** Taejin Eom (TurboWork) · 엄태진 — [turbowork.kr](https://turbowork.kr) · [Korean wiki](https://turbowork.kr/wiki/harness/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#mit-license)
-[![Public Spec](https://img.shields.io/badge/Scope-Public_Spec-455a64.svg)](#public-scope)
+[![Version](https://img.shields.io/badge/harness-v6.6.7-c8551b.svg)](#version-history)
+[![Self--test](https://img.shields.io/badge/self--test-112%2F112-2e7d32.svg)](#by-the-numbers)
 
-## Designed for organizational and project outcomes
+> The coding agent's own words — "done", "tests pass" — are never used as evidence.
+> Only machine checks, an audit by a model from a different vendor, and results the
+> runner observed itself can move a step forward.
 
-**Red-Sandwich Harness is a development process designed to optimize organizational
-and project outcomes by connecting goals, implementation, and verification.**
-It translates project priorities into explicit acceptance criteria, keeps changes
-within an agreed scope, and makes review evidence available for shared decisions.
-The process aims to reduce avoidable rework, support reliable handoffs, and help
-teams direct their time and resources toward the results that matter.
-Success is assessed against each project's agreed quality, delivery, and resource goals.
+![Red-Sandwich Harness full mechanism: human, harness, AI session and independent audit lanes](docs/harness-arch-en.svg)
 
-## In practice: progress visibility and review evidence
+*Orange: enforced by the harness · green: AI work · red: independent audit and failure handling · blue: human decisions.*
+([Korean diagram](docs/harness-arch-ko.svg))
 
-The following user-provided screenshots show the workflow in other development projects:
-stage tracking in a font project, and implementation alongside a review conversation.
+## What changed since the first public release
 
-![Pipeline HUD showing the active stage, progress, checkpoint label, and pending subtasks](https://github.com/jjangkjy5607-dev/red-sandwich-harness/releases/download/v0.1.0/pipeline-hud-example.png)
+The first release (Oct 27, 2026) described a three-layer contract with a Gemini red-team
+reviewer and a 46-line mock example. Since then the harness has been rebuilt around one
+lesson: **rules written in a prompt get skipped when the agent is busy.** Most of the
+harness is now code — hooks, a runner and audit tools that block progress when a rule
+is broken.
 
-**Know where work stands.** Captured at Step 12 of 15, the HUD brings the active
-subtask, previous-stage checkpoint label, and waiting tasks into one view.
-Teams can see the current stage and the work still ahead at a glance.
+| | First release (v5.x, Oct 2026) | Now (v6.6.7, Nov 14, 2026) |
+|---|---|---|
+| Builder | Codex | Claude Code (one fresh session per step) |
+| Auditor | Gemini, in a separate chat | OpenAI GPT, two separate audits called by tools |
+| Who calls the final audit | The coding session | The runner, after the session has ended |
+| Rule enforcement | Instructions in one long document | 97 numbered rules; hooks, a rule auditor and the runner enforce them |
+| What gets committed | Whatever the session left | Exactly the git tree that passed audit |
 
-<details>
-<summary>View implementation, review, and terminal status together</summary>
+## How one step runs
 
-![User-provided implementation and Gemini review screenshot with terminal checklist](https://github.com/jjangkjy5607-dev/red-sandwich-harness/releases/download/v0.1.0/implementation-review-example.png)
+1. **Spec first.** `overview.md` and `steps/stepNN.md` fix inputs, outputs and acceptance
+   checks, with at least three sub-tasks per step. The runner refuses to start a step without them.
+2. **One session, one step.** `run_pipeline.ps1` starts a new non-interactive Claude Code
+   session for the step. A session never starts the next step.
+3. **Machine checks on every save.** Hooks parse the code (AST) after each edit:
+   200 lines per file (350 with approval), 35 logic lines per function, cyclomatic
+   complexity ≤ 5, no empty `except`, no unexplained sleeps. They run again when the
+   session tries to stop; three blocked stops in a row roll the step back.
+4. **Rule audit (GPT).** A rule auditor receives the diff plus the judgement rules from
+   `rules.md` and returns only rule violations. Findings that cite unknown rules, files that
+   were not sent, or code that does not exist are discarded by the tool.
+5. **Audit request, not a verdict.** The session writes the test log and an audit request
+   file, sets `VERIFIED_PASS` and exits. It cannot call the final audit or edit audit records —
+   a pre-tool hook blocks both.
+6. **The runner audits.** The runner freezes the tree (`git add -A`), re-runs the rule audit,
+   runs hidden tests, and calls the **final audit (GPT)** itself. Only a verdict the runner
+   received directly counts.
+7. **FAIL → automatic retry.** A new session with one level higher reasoning effort reads the
+   failure text and the failure rack and patches everything in one batch. The fourth FAIL
+   stops for a human decision.
+8. **PASS → commit the audited tree.** The runner checks that the working tree, the index tree
+   ID, the audit record and the test-log hash all match the frozen tree, then commits that tree
+   ID directly (`git commit-tree` + compare-and-swap `update-ref`). If one byte changed, it stops.
+9. **Handoff.** A step is complete only when the next session's start hook has acknowledged it.
 
-The review text reports seven passing tests and a PASS verdict for the discussed
-change; the terminal separately shows working and waiting tasks. These screenshots
-illustrate coordination and visible review records. The underlying projects and
-their tests are outside this two-file public example.
+### The sandwich, today
 
-</details>
+| Layer | Meaning | Enforced by |
+|---|---|---|
+| Top bread | Spec lock + test-first gate | runner pre-checks, test lock (`tests: write` steps only), hidden tests |
+| Filling | Small pure units | AST lint hook on every edit and at stop |
+| Bottom bread | Strict isolation | one session per step, atomic state writes with lock + revision merge, protected keys |
+| Red line | Independent auditor from another vendor | GPT rule audit + GPT final audit called by the runner |
 
-한국어: 실제 작업 화면에서 현재 단계·활성 작업·대기 항목과 검토 기록을 함께 확인하는
-방식을 보여 줍니다. 폰트 프로젝트 HUD의 12/15 표시는 촬영 당시 단계 위치이며,
-검수 화면의 PASS는 해당 변경에 대한 대화상 판정입니다.
+### Failure rack
 
-## Watch: define the spec before coding
+Every failure is written down as four fields — **what triggered it · environment · where
+it broke · the deterministic guard that now prevents it** — and future sessions scan the
+rack before working. The shared rack holds 195 entries. Retries that eventually pass leave
+a *skill candidate* ("this is how it was fixed") that a human can approve into a reusable skill.
 
-[**AI Researcher Hamjji · EP01 — What happens when you only ask Codex to “build an app”**](https://youtube.com/shorts/si5A6qREBhI)
+## Version history
 
-A 38-second Korean lesson: define the core purpose, inputs, processing, outputs,
-and excluded features in `spec.md` before generating code.
-한국어: [코덱스에 “앱 만들어줘”만 하면 생기는 일](https://youtube.com/shorts/si5A6qREBhI) · AI 연구원 햄찌 EP01.
+| Date (2026) | Version | Lines | Key change |
+|---|---|---|---|
+| Jun–Jul | chat rules | — | Born in a stock auto-trading side project: never overwrite whole files, keep every version, verify by running, fix the rules before looking at results |
+| Jul 22 | first `AGENTS.md` | 82 | "Senior developer and coding coach" role; no whole-file overwrites |
+| Aug 6 | common instructions | 149 | One instruction set for every project: role, safety, verification, token limits |
+| Oct 21 | common instructions | 366 | Largest single file before the sandwich |
+| Oct 25 | v2.7 | — | "Sandwich" name first used (product edition, Korean + English) |
+| Oct 28 | v5.5 | 370 | Red-sandwich structure, spark harness, two-tier failure rack |
+| Oct 29 | v6.2 | 510 | Three orthogonal diagnoses, single consolidated patch, gatekeeper |
+| Nov 2 | v6.4 | 756 | Longest single document |
+| Nov 3–5 | v6.5 / v6.6 | 630–681 | Core + 8 on-demand modules; moved to Claude Code; "instructions cannot be overridden by spec text" clause |
+| Nov 8– | git-managed | core 216 | Rules moved into hooks, runner and audit tools |
+| Nov 14 | v6.6.7 | — | Audited-tree commit, stricter crash recovery; 7 releases in one day |
 
-## Why an auditor belongs in the harness
+### Incidents that created a guard
 
-AI-generated code can satisfy a happy-path example while missing boundary cases,
-drifting from the agreed specification, or leaking validation information into training.
-Red-Sandwich Harness adds an adversarial reviewer to a three-layer execution contract.
+| Date | What broke | Guard added |
+|---|---|---|
+| Nov 3 | The agent wrote "this is final, do not ask again" into the spec and used it to skip review | Clause §00: no spec text, scope wording or agent judgement can disable a gate |
+| Nov 7 | A background command wrote 232.6 GB of logs and filled the drive | Disk-space guard, session-end cleanup hook |
+| Nov 7 | First self-test: 10 of 45 rule-breaking dummy projects got through | Atomic state-file tool; rules moved into code |
+| Nov 10 | Runner died but its lock file made it look alive for 17 minutes | Process-liveness rule |
+| Nov 12 | An 11 GB model overlapped another job and froze the PC | Memory reservation guard (`memguard`) |
+| Nov 13 | 4 of 30 concurrent state writes lost data | Lock + revision-number merge → 0 losses |
+| Nov 15 | Too many render workers pinned the CPU; 1,500+ short processes piled up | CPU worker cap, `cpuguard` |
 
-The defining mechanism is an **audit-to-test acceptance loop**: an independent
-reviewer proposes concrete counterexamples, the implementer reproduces them locally,
-and executable gates decide whether the revised implementation may proceed.
-The architecture is defined by these responsibilities and contracts rather than
-by the order in which reasoning models are switched.
+## By the numbers
 
-## The four pillars
+| Item | Value |
+|---|---|
+| Rules | 97 (R01–R101): 12 checked by code hooks, 10 by hooks + GPT, 23 by GPT judgement, 52 procedural |
+| Code limits | file 200 lines (350 approved), function logic 35 lines, complexity 5, loop nesting 2 |
+| Self-test | Nov 7: 35/45 → Nov 14: 112/112 |
+| Atomic write stress test | 3 paths × 900 writes, 0 leftover temp files, 0 read errors |
+| Audit tool unit tests | final audit 53, rule audit 35 |
+| Projects using it | 20 |
+| Cost example per session | build ≈ $0.57, rule audit ≈ $0.01 |
 
-### 1. The Auditor — Gemini Red-Team
+## Limits
 
-After code generation, Gemini's proposed role is to challenge the implementation
-with missing values, extreme inputs, shape mismatches, and possible leakage paths.
-Each finding should include a concrete failing input and the expected behavior.
-Reproduce findings locally before accepting them. If a finding changes the agreed
-contract, approve and record the specification change before locking new tests.
-Then revise the implementation and rerun the relevant regression checks.
-
-The public example uses a clearly named **offline mock**, not a Gemini integration.
-Its fixed finite-value and magnitude checks illustrate an audit verdict;
-they do not inspect source semantics or discover every leakage path.
-Only an explicit Boolean `True` admits the next stage. `False`, `None`, strings,
-and integers are rejected before contract checks and model fitting.
-
-### 2. Top Bread — Spec-Lock TDD Gate
-
-Define input/output contracts before implementation and block execution on failure.
-The example requires a five-row DataFrame with exactly `x` and `y` columns,
-zero missing/non-finite values, and correctly shaped, finite predictions.
-`ValueError` gates remain active with Python's `-O` optimization flag.
-This two-file release demonstrates the gate; a complete CI/TDD suite is outside its scope.
-
-### 3. Core Filling — AST Pure Units
-
-Enforce **35 physical lines per function** and **200 lines per source file**.
-The example checks its own AST before fitting. `features` returns a copy of `x`
-without changing the input; the orchestrator owns stateful model fitting.
-Small units keep review context bounded. AST length checks and a model's review
-do not prove functional purity or guarantee hallucination-free code.
-
-### 4. Bottom Bread — Strict K-Fold Isolation
-
-Each fold constructs a fresh `StandardScaler` + `LinearRegression` pipeline.
-Only training rows reach `fit`; held-out rows use that fold's fitted preprocessing
-through `predict`. No fitted scaler or model is reused across folds.
-Freeze audit-derived contracts before evaluation; the example's magnitude bound
-is fixed in advance and is not estimated from held-out data.
-This isolates the demonstrated preprocessing fit. Group, temporal, target, and
-adaptive-validation leakage still need checks suited to the actual application.
+- Audits are closer to sampling than proof: re-running a PASS audit with the same model
+  produced new findings in about 20% of cases (20-case self comparison, Nov 16, 2026).
+- Only 22 rules are blocked mechanically; the rest rely on GPT judgement or procedure.
+- Built for one Windows PC; paths, guards and the runner assume that environment.
 
 ## Minimal proof of concept
 
-[`example_red_sandwich.py`](example_red_sandwich.py) uses five synthetic rows,
-`x = 0..4` and `y = 2x + 1`, created entirely in memory. The execution order is:
+[`example_red_sandwich.py`](example_red_sandwich.py) is the original 46-line illustration of
+the three layers on five synthetic rows (`x = 0..4`, `y = 2x + 1`):
 
 **AST preflight → mock audit verdict → input contract → pure feature extraction
 → five independent folds → prediction contract → fold MSE output.**
 
-The example is under 50 lines. Its tiny linear dataset illustrates control flow,
-not competition performance. No API key or Gemini network call is required.
-"Deterministic" describes explicit checks and fixed demo inputs, not deterministic
-LLM behavior or bit-for-bit identical numerical results on every platform.
-
-Tested runtime: Python 3.13, NumPy 2.5.4, pandas 3.1.0, scikit-learn 1.9.1.
-With [uv](https://docs.astral.sh/uv/) installed, run this in PowerShell:
+It uses a clearly named offline **mock** auditor — no API key or network call. Only an
+explicit Boolean `True` admits the next stage. It illustrates control flow, not the
+production harness, and does not prove purity or the absence of leakage.
 
 ```powershell
-Set-Location -LiteralPath 'D:\CodexProjects\red-sandwich-harness-public'
-$env:UV_CACHE_DIR = 'D:\CodexProjects\.cache\uv'
-$env:UV_PYTHON_INSTALL_DIR = 'D:\CodexProjects\.runtime\python'
-$env:TEMP = 'D:\CodexProjects\.tmp'
-$env:TMP = $env:TEMP
-New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
-uv venv --python 3.13 'D:\CodexProjects\.runtime\red-sandwich-public'
-uv pip install --python 'D:\CodexProjects\.runtime\red-sandwich-public\Scripts\python.exe' numpy==2.5.4 pandas==3.1.0 scikit-learn==1.9.1
-& 'D:\CodexProjects\.runtime\red-sandwich-public\Scripts\python.exe' -B '.\example_red_sandwich.py'
+uv venv --python 3.13 .venv
+uv pip install --python .venv\Scripts\python.exe numpy==2.5.4 pandas==3.1.0 scikit-learn==1.9.1
+.venv\Scripts\python.exe -B .\example_red_sandwich.py
 ```
 
 ## Public scope
 
-The Git tree contains exactly this specification and the synthetic example.
-The header illustration and workflow screenshots are hosted as GitHub release attachments.
-Production code, competition datasets, model weights, private feature logic, and
-paid product files are excluded from this repository and its MIT grant.
+This repository contains the public specification, the architecture diagrams and the
+synthetic example. The production runner, hooks, audit tools, rule file, competition data
+and paid product files are not included and are not covered by the MIT grant below.
 
 ## 한국어 요약
 
-**Red-Sandwich Harness는 조직과 프로젝트의 성과를 위해 목표·구현·검증을 연결하도록
-설계된 개발 프로세스입니다.** 프로젝트의 우선순위를 명확한 완료 기준으로 바꾸고,
-합의된 범위와 검증 근거를 공유하여 재작업을 줄이고 안정적인 인계를 돕는 것을 지향합니다.
-팀의 시간과 자원을 중요한 결과에 집중하며, 합의한 품질·납기·자원 목표를 기준으로 성과를 평가합니다.
+**레드 샌드위치 하네스**는 AI 코딩 에이전트의 말("완료했습니다", "테스트 통과")을 판정 근거로 쓰지
+않는 개발 파이프라인입니다. 기계 검사, 다른 회사 AI(GPT)의 검수, 실행기가 직접 확인한 결과만
+인정합니다. 처음에는 긴 지침 문서였지만, 글로 쓴 규칙은 AI가 바쁠 때 건너뛰어서 지금은 대부분이
+어기면 진행이 막히는 프로그램(훅·실행기·검수 도구)입니다.
 
-Red-Sandwich Harness(TSH-Auditor)는 엄태진(Taejin Eom / TurboWork)의 공개 아키텍처입니다.
-Gemini가 실패 사례를 제안하는 적대적 감사 역할을 맡고, 로컬 재현과 합의된 회귀 테스트로
-검토 결과를 구현 계약에 연결합니다. 모델 교체 순서보다 감사·재현·통과 조건에 초점을 둡니다.
-입출력·결측 검증, 함수35줄·파일200줄 AST 제한, Fold별 독립 학습이 실행을 통제합니다.
-공개 코드는 실제 Gemini 호출 대신 모의 감사 함수를 사용하며, 실전 데이터나 엔진은 포함하지 않습니다.
-감사·길이 제한만으로 모든 환각과 누수의 제거를 보장하지 않고 각 게이트의 검증 범위를 명시합니다.
+- Step 하나에 Claude Code 세션 하나. 세션은 검수 요청 파일만 남기고 끝나며, 최종 검수는 실행기가 부릅니다.
+- FAIL이면 사고 수준을 올린 새 세션이 실패 기록을 읽고 한 번에 고치고, 4번째 FAIL에서 사람이 결정합니다.
+- PASS면 검수한 git 트리 그대로만 커밋합니다. 그 사이 한 글자라도 바뀌면 멈춥니다.
+- 규칙 97개, 셀프테스트 112/112, 적용 프로젝트 20개 (2026-11-14 v6.6.7 기준).
+
+자세한 탄생기와 연표: [터보워크 위키 — 레드 샌드위치 하네스](https://turbowork.kr/wiki/harness/)
 
 ## MIT License
 
@@ -180,16 +183,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## Get the Sandwich Workflow Kit on Gumroad
+## Sandwich Workflow Kit (paid)
 
-Apply a structured plan → build → review workflow with the **Sandwich Workflow Kit v2.7**:
-editable English and Korean instructions, a Windows quickstart, FAQs, and two
-15-step project blueprints, delivered as Markdown documents and supporting assets in a ZIP.
+The **Sandwich Workflow Kit v2.7** on Gumroad is the October 2026 document edition:
+editable English and Korean instructions, a Windows quickstart, FAQs and two 15-step
+project blueprints (Markdown in a ZIP). It predates the v6.6 automation described above and
+follows its own product license, separate from this MIT release.
 
-Starter covers personal noncommercial learning, Pro covers one person's commercial
-or client work, and Team covers up to five named users in one organization.
-Paid downloads follow their own product license, separate from this public MIT release.
-
-**[👉 Get the Sandwich Workflow Kit v2.7 on Gumroad](https://turboworkai.gumroad.com/l/sandwich-workflow-kit)**
-
-한국어: 실제 판매 상품인 v2.7 한영 문서 키트의 구성과 이용권은 위 링크에서 확인할 수 있습니다.
+**[Sandwich Workflow Kit v2.7 on Gumroad](https://turboworkai.gumroad.com/l/sandwich-workflow-kit)**
