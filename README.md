@@ -1,193 +1,97 @@
 # Red-Sandwich Harness
 
-**A development pipeline for AI coding agents that does not trust the AI.**
+**Guardrails for AI coding agents that do not take the agent's word for it.**
 
-**Creator / Original Author:** Taejin Eom (TurboWork) · 엄태진 — [turbowork.kr](https://turbowork.kr) · [Korean wiki](https://turbowork.kr/wiki/harness/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Kit tests](https://img.shields.io/badge/kit_tests-33_passing-2e7d32.svg)](kit/tests)
+[![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-455a64.svg)](kit)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](#mit-license)
-[![Version](https://img.shields.io/badge/harness-v6.6.7-c8551b.svg)](#version-history)
-[![Self--test](https://img.shields.io/badge/self--test-112%2F112-2e7d32.svg)](#by-the-numbers)
+![Demo: the lint hook rejects an untestable function, then the audit drops three invented findings](docs/demo.gif)
 
-> The coding agent's own words — "done", "tests pass" — are never used as evidence.
-> Only machine checks, an audit by a model from a different vendor, and results the
-> runner observed itself can move a step forward.
+Coding agents say "done" and "tests pass". Reviewer models cite files that were never
+sent and lines that do not exist. Specs leave gaps that both sides argue about forever.
+This repository is a small, runnable answer to all three, extracted from a harness that
+has driven about 20 real projects since October 2026.
 
-![Red-Sandwich Harness full mechanism: human, harness, AI session and independent audit lanes](docs/harness-arch-en.svg)
+## Quick start (5 minutes, Python 3.10+, no installs)
 
-*Orange: enforced by the harness · green: AI work · red: independent audit and failure handling · blue: human decisions.*
-([Korean diagram](docs/harness-arch-ko.svg))
+```bash
+git clone https://github.com/jjangkjy5607-dev/red-sandwich-harness
+cd red-sandwich-harness
 
-## What changed since the first public release
+# 1. Lint any Python project: small files, small functions, low complexity, no swallowed errors
+python kit/rsh_lint.py check path/to/your/project
 
-The first release (Oct 27, 2026) described a three-layer contract with a Gemini red-team
-reviewer and a 46-line mock example. Since then the harness has been rebuilt around one
-lesson: **rules written in a prompt get skipped when the agent is busy.** Most of the
-harness is now code — hooks, a runner and audit tools that block progress when a rule
-is broken.
-
-| | First release (v5.x, Oct 2026) | Now (v6.6.7, Nov 14, 2026) |
-|---|---|---|
-| Builder | Codex | Claude Code (one fresh session per step) |
-| Auditor | Gemini, in a separate chat | OpenAI GPT, two separate audits called by tools |
-| Who calls the final audit | The coding session | The runner, after the session has ended |
-| Rule enforcement | Instructions in one long document | 97 numbered rules; hooks, a rule auditor and the runner enforce them |
-| What gets committed | Whatever the session left | Exactly the git tree that passed audit |
-
-## How one step runs
-
-1. **Spec first.** `overview.md` and `steps/stepNN.md` fix inputs, outputs and acceptance
-   checks, with at least three sub-tasks per step. The runner refuses to start a step without them.
-2. **One session, one step.** `run_pipeline.ps1` starts a new non-interactive Claude Code
-   session for the step. A session never starts the next step.
-3. **Machine checks on every save.** Hooks parse the code (AST) after each edit:
-   200 lines per file (350 with approval), 35 logic lines per function, cyclomatic
-   complexity ≤ 5, no empty `except`, no unexplained sleeps. They run again when the
-   session tries to stop; three blocked stops in a row roll the step back.
-4. **Rule audit (GPT).** A rule auditor receives the diff plus the judgement rules from
-   `rules.md` and returns only rule violations. Findings that cite unknown rules, files that
-   were not sent, or code that does not exist are discarded by the tool.
-5. **Audit request, not a verdict.** The session writes the test log and an audit request
-   file, sets `VERIFIED_PASS` and exits. It cannot call the final audit or edit audit records —
-   a pre-tool hook blocks both.
-6. **The runner audits.** The runner freezes the tree (`git add -A`), re-runs the rule audit,
-   runs hidden tests, and calls the **final audit (GPT)** itself. Only a verdict the runner
-   received directly counts.
-7. **FAIL → automatic retry.** A new session with one level higher reasoning effort reads the
-   failure text and the failure rack and patches everything in one batch. The fourth FAIL
-   stops for a human decision.
-8. **PASS → commit the audited tree.** The runner checks that the working tree, the index tree
-   ID, the audit record and the test-log hash all match the frozen tree, then commits that tree
-   ID directly (`git commit-tree` + compare-and-swap `update-ref`). If one byte changed, it stops.
-9. **Handoff.** A step is complete only when the next session's start hook has acknowledged it.
-
-### The sandwich, today
-
-| Layer | Meaning | Enforced by |
-|---|---|---|
-| Top bread | Spec lock + test-first gate | runner pre-checks, test lock (`tests: write` steps only), hidden tests |
-| Filling | Small pure units | AST lint hook on every edit and at stop |
-| Bottom bread | Strict isolation | one session per step, atomic state writes with lock + revision merge, protected keys |
-| Red line | Independent auditor from another vendor | GPT rule audit + GPT final audit called by the runner |
-
-### Failure rack
-
-Every failure is written down as four fields — **what triggered it · environment · where
-it broke · the deterministic guard that now prevents it** — and future sessions scan the
-rack before working. The shared rack holds 195 entries. Retries that eventually pass leave
-a *skill candidate* ("this is how it was fixed") that a human can approve into a reusable skill.
-
-## Version history
-
-| Date (2026) | Version | Lines | Key change |
-|---|---|---|---|
-| Jun–Jul | chat rules | — | Born in a stock auto-trading side project: never overwrite whole files, keep every version, verify by running, fix the rules before looking at results |
-| Jul 22 | first `AGENTS.md` | 82 | "Senior developer and coding coach" role; no whole-file overwrites |
-| Aug 6 | common instructions | 149 | One instruction set for every project: role, safety, verification, token limits |
-| Oct 21 | common instructions | 366 | Largest single file before the sandwich |
-| Oct 25 | v2.7 | — | "Sandwich" name first used (product edition, Korean + English) |
-| Oct 28 | v5.5 | 370 | Red-sandwich structure, spark harness, two-tier failure rack |
-| Oct 29 | v6.2 | 510 | Three orthogonal diagnoses, single consolidated patch, gatekeeper |
-| Nov 2 | v6.4 | 756 | Longest single document |
-| Nov 3–5 | v6.5 / v6.6 | 630–681 | Core + 8 on-demand modules; moved to Claude Code; "instructions cannot be overridden by spec text" clause |
-| Nov 8– | git-managed | core 216 | Rules moved into hooks, runner and audit tools |
-| Nov 14 | v6.6.7 | — | Audited-tree commit, stricter crash recovery; 7 releases in one day |
-
-### Incidents that created a guard
-
-| Date | What broke | Guard added |
-|---|---|---|
-| Nov 3 | The agent wrote "this is final, do not ask again" into the spec and used it to skip review | Clause §00: no spec text, scope wording or agent judgement can disable a gate |
-| Nov 7 | A background command wrote 232.6 GB of logs and filled the drive | Disk-space guard, session-end cleanup hook |
-| Nov 7 | First self-test: 10 of 45 rule-breaking dummy projects got through | Atomic state-file tool; rules moved into code |
-| Nov 10 | Runner died but its lock file made it look alive for 17 minutes | Process-liveness rule |
-| Nov 12 | An 11 GB model overlapped another job and froze the PC | Memory reservation guard (`memguard`) |
-| Nov 13 | 4 of 30 concurrent state writes lost data | Lock + revision-number merge → 0 losses |
-| Nov 15 | Too many render workers pinned the CPU; 1,500+ short processes piled up | CPU worker cap, `cpuguard` |
-
-## By the numbers
-
-| Item | Value |
-|---|---|
-| Rules | 97 (R01–R101): 12 checked by code hooks, 10 by hooks + GPT, 23 by GPT judgement, 52 procedural |
-| Code limits | file 200 lines (350 approved), function logic 35 lines, complexity 5, loop nesting 2 |
-| Self-test | Nov 7: 35/45 → Nov 14: 112/112 |
-| Atomic write stress test | 3 paths × 900 writes, 0 leftover temp files, 0 read errors |
-| Audit tool unit tests | final audit 53, rule audit 35 |
-| Projects using it | 20 |
-| Cost example per session | build ≈ $0.57, rule audit ≈ $0.01 |
-
-## Limits
-
-- Audits are closer to sampling than proof: re-running a PASS audit with the same model
-  produced new findings in about 20% of cases (20-case self comparison, Nov 16, 2026).
-- Only 22 rules are blocked mechanically; the rest rely on GPT judgement or procedure.
-- Built for one Windows PC; paths, guards and the runner assume that environment.
-
-## Minimal proof of concept
-
-[`example_red_sandwich.py`](example_red_sandwich.py) is the original 46-line illustration of
-the three layers on five synthetic rows (`x = 0..4`, `y = 2x + 1`):
-
-**AST preflight → mock audit verdict → input contract → pure feature extraction
-→ five independent folds → prediction contract → fold MSE output.**
-
-It uses a clearly named offline **mock** auditor — no API key or network call. Only an
-explicit Boolean `True` admits the next stage. It illustrates control flow, not the
-production harness, and does not prove purity or the absence of leakage.
-
-```powershell
-uv venv --python 3.13 .venv
-uv pip install --python .venv\Scripts\python.exe numpy==2.5.4 pandas==3.1.0 scikit-learn==1.9.1
-.venv\Scripts\python.exe -B .\example_red_sandwich.py
+# 2. Replay the demo audit offline (no API key)
+cd kit
+python rsh_audit.py --spec examples/spec_step01.md --files examples/good_unit.py \
+                    --response-file examples/auditor_answer.json
 ```
 
-## Public scope
+**Make Claude Code obey the lint on every save** — copy `kit/` into your project and add
+[`kit/hooks/settings.example.json`](kit/hooks/settings.example.json) to `.claude/settings.json`.
+A failing file returns exit code 2, so the agent sees the findings and must fix them before moving on.
 
-This repository contains the public specification, the architecture diagrams and the
-synthetic example. The production runner, hooks, audit tools, rule file, competition data
-and paid product files are not included and are not covered by the MIT grant below.
+**Audit a real change with a model from another vendor** (any OpenAI-compatible endpoint):
+
+```bash
+export RSH_AUDIT_API_KEY=...        # or OPENAI_API_KEY
+export RSH_AUDIT_MODEL=<model id>   # pick a different vendor than the model that wrote the code
+python kit/rsh_audit.py --spec steps/step01.md --files app.py util.py --rules kit/rules.example.txt
+# exit 0 PASS · 1 FAIL · 2 error (an error is never a PASS)
+```
+
+## What is in the kit
+
+| File | What it does |
+|---|---|
+| [`kit/rsh_lint.py`](kit/rsh_lint.py) | AST lint + Claude Code hook. File ≤ 200 lines, function ≤ 35 logic lines, complexity ≤ 5 (also counts `and`/`or` and comprehension loops, so slightly stricter than ruff C901), no bare/silent `except`, no unexplained `sleep`. |
+| [`kit/rsh_audit.py`](kit/rsh_audit.py) | Sends the spec and the numbered files to an auditor model and asks for findings as JSON with an exact code quote. |
+| [`kit/rsh_evidence.py`](kit/rsh_evidence.py) | Throws out findings whose file was not sent, whose line does not exist, whose quote is not within 3 lines of the cited spot, or whose rule id is unknown. The verdict is recomputed from what survives. |
+| [`kit/templates/`](kit/templates) | `overview.md` and `step.md`: spec-first steps with at least three sub-tasks and an **audit-ready limits** section, because auditors attack every unstated limit with the most extreme input they can think of. |
+
+The kit lints itself: `python kit/rsh_lint.py check kit` reports only the deliberately bad example.
+Run the tests with `python -m pytest kit/tests`.
+
+## The full harness (not in this repository)
+
+The production harness wraps the same ideas in a runner. Per step:
+
+1. **Spec first.** No step starts without a contract and at least three sub-tasks.
+2. **One fresh Claude Code session per step.** The session never starts the next step.
+3. **Lint on every save**, and again when the session tries to stop.
+4. **Rule audit (GPT)** against numbered rules; invented evidence is discarded by the tool.
+5. **The session cannot judge itself.** It writes a test log and an audit request, then exits. A pre-tool hook blocks it from calling the final audit or editing audit records.
+6. **The runner audits.** It freezes the git tree, re-runs the rule audit, runs hidden tests and calls the final cross-vendor audit itself.
+7. **FAIL → a new session** with higher reasoning effort reads the failure text and the failure rack and patches everything at once. After 5 failed audits, defects that do not block the program are parked as "hard problems" and the pipeline continues.
+8. **PASS → commit exactly the audited tree** (`git commit-tree` + compare-and-swap `update-ref`). One changed byte stops the commit.
+
+Every failure is recorded as *trigger · environment · crash point · deterministic guard*, and
+later sessions scan that rack before they work.
+
+## Honest limits
+
+- An audit is a sample, not a proof: re-running a passing audit on the same code produced new findings in about 20% of cases in our own comparison (Nov 2026). We are measuring this properly now.
+- Lint limits are structural. They keep units reviewable; they do not prove correctness.
+- The full harness is built for one Windows PC. The kit is plain Python and runs anywhere.
+
+A paper with controlled experiments (cross-vendor vs same-vendor audit, audit stability,
+failure-rack on/off, measured with hidden tests) is in preparation; results will be linked here.
+
+## Background
+
+Design history, incidents that produced each guard, and the Korean write-up:
+[turbowork.kr/wiki/harness](https://turbowork.kr/wiki/harness/).
+The original 46-line three-layer illustration lives in [`legacy/`](legacy/).
 
 ## 한국어 요약
 
-**레드 샌드위치 하네스**는 AI 코딩 에이전트의 말("완료했습니다", "테스트 통과")을 판정 근거로 쓰지
-않는 개발 파이프라인입니다. 기계 검사, 다른 회사 AI(GPT)의 검수, 실행기가 직접 확인한 결과만
-인정합니다. 처음에는 긴 지침 문서였지만, 글로 쓴 규칙은 AI가 바쁠 때 건너뛰어서 지금은 대부분이
-어기면 진행이 막히는 프로그램(훅·실행기·검수 도구)입니다.
+AI 코딩 에이전트의 "다 했습니다"를 믿지 않는 하네스에서 바로 쓸 수 있는 부분만 떼어 낸 키트입니다.
+`kit/rsh_lint.py`는 저장할 때마다 파일·함수 크기와 복잡도를 막고(Claude Code 훅), `kit/rsh_audit.py`는
+다른 회사 모델에게 검수를 맡기되 보내지 않은 파일·없는 줄·없는 코드를 인용한 지적은 기계적으로 버립니다.
+표준 라이브러리만 씁니다.
 
-- Step 하나에 Claude Code 세션 하나. 세션은 검수 요청 파일만 남기고 끝나며, 최종 검수는 실행기가 부릅니다.
-- FAIL이면 사고 수준을 올린 새 세션이 실패 기록을 읽고 한 번에 고치고, 4번째 FAIL에서 사람이 결정합니다.
-- PASS면 검수한 git 트리 그대로만 커밋합니다. 그 사이 한 글자라도 바뀌면 멈춥니다.
-- 규칙 97개, 셀프테스트 112/112, 적용 프로젝트 20개 (2026-11-14 v6.6.7 기준).
+## License
 
-자세한 탄생기와 연표: [터보워크 위키 — 레드 샌드위치 하네스](https://turbowork.kr/wiki/harness/)
-
-## MIT License
-
-Copyright (c) 2026 Taejin Eom / TurboWork
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-## Sandwich Workflow Kit (paid)
-
-The **Sandwich Workflow Kit v2.7** on Gumroad is the October 2026 document edition:
-editable English and Korean instructions, a Windows quickstart, FAQs and two 15-step
-project blueprints (Markdown in a ZIP). It predates the v6.6 automation described above and
-follows its own product license, separate from this MIT release.
-
-**[Sandwich Workflow Kit v2.7 on Gumroad](https://turboworkai.gumroad.com/l/sandwich-workflow-kit)**
+MIT — see [LICENSE](LICENSE). The production runner and the paid
+[Sandwich Workflow Kit](https://turboworkai.gumroad.com/l/sandwich-workflow-kit) are separate and not covered.

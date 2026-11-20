@@ -1,0 +1,5 @@
+.harness/
+__pycache__/
+*.pyc
+.pytest_cache/
+audit_report.json

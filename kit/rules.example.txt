@@ -1,0 +1,3 @@
+SPEC  Behaviour must match the step contract (inputs, outputs, limits).
+SEC   No secrets, card numbers or tokens in code, logs or output.
+DATA  No silent data loss; failures are logged or returned.

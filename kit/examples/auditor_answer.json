@@ -1,0 +1,6 @@
+{"findings": [
+  {"file": "examples/good_unit.py", "line": 23, "quote": "shipped = [ship_one(o, client, log) for o in orders if should_ship(o)]", "severity": "medium", "rule": "SPEC", "reason": "No check of the 5,000 orders-per-call limit."},
+  {"file": "examples/good_unit.py", "line": 40, "quote": "retries = 0", "severity": "critical", "rule": "SPEC", "reason": "Infinite retry loop."},
+  {"file": "examples/payment.py", "line": 3, "quote": "charge(card, amount)", "severity": "critical", "rule": "SEC", "reason": "Card number is logged."},
+  {"file": "examples/good_unit.py", "line": 6, "quote": "return order['paid'] and order['country'] == 'KR'", "severity": "high", "rule": "SPEC", "reason": "KeyError when a key is missing."}
+]}
