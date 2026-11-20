@@ -1,0 +1,31 @@
+name: kit tests
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install pytest
+      - run: python -m pytest -q kit/tests
+      - name: README quick start (lint finds only the deliberately bad example)
+        shell: bash
+        run: |
+          set +e
+          python kit/rsh_lint.py check kit | tee lint.txt
+          code=$?
+          set -e
+          test "$(grep -c '\[R0' lint.txt)" = "3" && ! grep -v bad_unit lint.txt | grep -q '\[R0'
+      - name: README quick start (offline audit replay passes)
+        shell: bash
+        working-directory: kit
+        run: python rsh_audit.py --spec examples/spec_step01.md --files examples/good_unit.py --response-file examples/auditor_answer.json
