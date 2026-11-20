@@ -31,6 +31,8 @@ python rsh_audit.py --spec examples/spec_step01.md --files examples/good_unit.py
 **Make Claude Code obey the lint on every save** — copy `kit/` into your project and add
 [`kit/hooks/settings.example.json`](kit/hooks/settings.example.json) to `.claude/settings.json`.
 A failing file returns exit code 2, so the agent sees the findings and must fix them before moving on.
+On macOS/Linux use `python3` in that command if `python` is not on your PATH. Tested end to end with Claude Code:
+asked to cram eight pricing rules into one function, the agent hit `complexity 10 > 5`, split it into four helpers and saved again.
 
 **Audit a real change with a model from another vendor** (any OpenAI-compatible endpoint):
 

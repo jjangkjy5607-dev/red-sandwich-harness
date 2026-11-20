@@ -181,7 +181,7 @@ def run_hook(raw: str) -> int:
     issues = check_file(path)
     if not issues:
         return 0
-    sys.stderr.write("rsh-lint blocked this edit. Split or simplify, then save again:\n")
+    sys.stderr.write("rsh-lint rejected this file (it was saved, but must be fixed). Split or simplify, then save again:\n")
     sys.stderr.write("\n".join(str(i) for i in issues) + "\n")
     return 2
 
