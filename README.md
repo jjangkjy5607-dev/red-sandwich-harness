@@ -6,7 +6,7 @@
 [![kit tests](https://github.com/jjangkjy5607-dev/red-sandwich-harness/actions/workflows/tests.yml/badge.svg)](https://github.com/jjangkjy5607-dev/red-sandwich-harness/actions/workflows/tests.yml)
 [![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-455a64.svg)](kit)
 
-![Demo: the lint hook rejects an untestable function, then the audit drops three invented findings](docs/demo.gif)
+[![Red-Sandwich Harness in 30 seconds: every save is checked, invented audit evidence is thrown out, only audited code ships](docs/promo.gif)](docs/promo.mp4)
 
 Coding agents say "done" and "tests pass". Reviewer models cite files that were never
 sent and lines that do not exist. Specs leave gaps that both sides argue about forever.
@@ -52,6 +52,10 @@ python kit/rsh_audit.py --spec steps/step01.md --files app.py util.py --rules ki
 | [`kit/rsh_evidence.py`](kit/rsh_evidence.py) | Throws out findings whose file was not sent, whose line does not exist, whose quote is not within 3 lines of the cited spot, or whose rule id is unknown. The verdict is recomputed from what survives. |
 | [`kit/templates/`](kit/templates) | `overview.md` and `step.md`: spec-first steps with at least three sub-tasks and an **audit-ready limits** section, because auditors attack every unstated limit with the most extreme input they can think of. |
 
+Real terminal output of both tools:
+
+![Terminal demo: the lint hook rejects an untestable function, then the audit drops three invented findings](docs/demo.gif)
+
 The kit lints itself: `python kit/rsh_lint.py check kit` reports only the deliberately bad example.
 Run the tests with `python -m pytest kit/tests`.
 
@@ -67,6 +71,8 @@ The production harness wraps the same ideas in a runner. Per step:
 6. **The runner audits.** It freezes the git tree, re-runs the rule audit, runs hidden tests and calls the final cross-vendor audit itself.
 7. **FAIL → a new session** with higher reasoning effort reads the failure text and the failure rack and patches everything at once. After 5 failed audits, defects that do not block the program are parked as "hard problems" and the pipeline continues.
 8. **PASS → commit exactly the audited tree** (`git commit-tree` + compare-and-swap `update-ref`). One changed byte stops the commit.
+
+![Red-Sandwich Harness full mechanism: human, harness, AI session and independent audit lanes](docs/harness-arch-en.svg)
 
 Every failure is recorded as *trigger · environment · crash point · deterministic guard*, and
 later sessions scan that rack before they work.
