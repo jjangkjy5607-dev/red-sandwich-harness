@@ -3,7 +3,7 @@
 **Guardrails for AI coding agents that do not take the agent's word for it.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Kit tests](https://img.shields.io/badge/kit_tests-33_passing-2e7d32.svg)](kit/tests)
+[![kit tests](https://github.com/jjangkjy5607-dev/red-sandwich-harness/actions/workflows/tests.yml/badge.svg)](https://github.com/jjangkjy5607-dev/red-sandwich-harness/actions/workflows/tests.yml)
 [![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-455a64.svg)](kit)
 
 ![Demo: the lint hook rejects an untestable function, then the audit drops three invented findings](docs/demo.gif)
